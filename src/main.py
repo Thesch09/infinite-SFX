@@ -10,24 +10,29 @@ sounds = {} # This dictionary contains the sounds sepperated by which folder the
 allSounds = [] # This list contains all of the sounds
 folderSynonyms = {}
 
-print(folders)
-for folder in folders:
+def lookInFolder(path, folder):
+    global allSounds
+    global sounds
     soundsInFolder = [] # This list contains the sounds in the current folder so that it can be put together with the folder name
-    sfxs = os.listdir(f"./sfx/{folder}")
+    sfxs = os.listdir(f"{path}/{folder}")
     for sfx in sfxs:
         s_f_x = sfx.split(".")
-        
-        if s_f_x[-1] == "wav" or s_f_x[-1] == "mp3":
+        if len(s_f_x) == 1:
+            lookInFolder(f"{path}/{folder}",sfx)
+        elif s_f_x[-1] == "wav" or s_f_x[-1] == "mp3":
             print(sfx)
             print(s_f_x)
             soundsInFolder.append(sfx)
-            allSounds.append(f"./sfx/{folder}/{sfx}")
+            allSounds.append(f"{path}/{folder}/{sfx}")
         elif s_f_x[-1] == "txt":
-            with open(f"./sfx/{folder}/{sfx}") as txt:
+            with open(f"{path}/{folder}/{sfx}") as txt:
                 folderSynonyms.update({folder:txt.readline().split("\n")[0]})
                 print(folderSynonyms)
-    print(f"{soundsInFolder}\n{allSounds}")
     sounds.update({folder:soundsInFolder})
+
+print(folders)
+for folder in folders:
+    lookInFolder("./sfx", folder)
 print(sounds)
 print()
 
@@ -49,7 +54,7 @@ def showYourPercentage(): # Shows how likely it is a sound will play
 
 lastPlayedSounds = []
 def showLPS(lps):
-    print(f"Prevously played spounds:")
+    print(f"Prevously played sounds:")
     for sound in lps:
         print(f"\t{sound}")
 
@@ -106,6 +111,8 @@ def setupSettings():
 setupSettings()
 
 while True:
+    print("VoidliiBoi's Inifinite SFX")
+    print()
     showYourPercentage()
     if len(lastPlayedSounds) > 0:
         showLPS(lastPlayedSounds)
@@ -127,11 +134,13 @@ while True:
     print(f"Playing [violet]\"{playedSoundSplit[-1]}\"[/violet] with {loudy}% volume\n") # What's that soundèmon?
     playsound(allSounds[soundThatllBePlayed],loudy)
 
-    fodlerName = playedSoundSplit[2]
-    if playedSoundSplit[2] in folderSynonyms:
-        fodlerName = folderSynonyms[playedSoundSplit[2]]
+    fodlerName = playedSoundSplit[-2]
+    print(playedSoundSplit[-2])
+    if fodlerName in folderSynonyms:
+        fodlerName = folderSynonyms[playedSoundSplit[-2]]
     lastPlayedSounds.append(f"[violet]\"{playedSoundSplit[-1]}\"[/violet] from {fodlerName}")
 
     if len(lastPlayedSounds) > 5:
         lastPlayedSounds.pop(0)
+    time.sleep(2)
     os.system("cls") # Clears the console
